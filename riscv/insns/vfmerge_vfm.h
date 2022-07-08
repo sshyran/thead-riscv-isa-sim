@@ -5,39 +5,39 @@ VI_VFP_COMMON;
 switch(P.VU.vsew) {
   case e16:
     for (reg_t i=P.VU.vstart; i<vl; ++i) {
-      auto &vd = P.VU.elt<float16_t>(rd_num, i, true);
+      auto &vd = P.VU.elt_ref<float16_t>(rd_num, i, true);
       auto rs1 = f16(READ_FREG(rs1_num));
-      auto vs2 = P.VU.elt<float16_t>(rs2_num, i);
+      auto vs2 = P.VU.elt_val<float16_t>(rs2_num, i);
 
       int midx = i / 64;
       int mpos = i % 64;
-      bool use_first = (P.VU.elt<uint64_t>(0, midx) >> mpos) & 0x1;
+      bool use_first = (P.VU.elt_val<uint64_t>(0, midx) >> mpos) & 0x1;
 
       vd = use_first ? rs1 : vs2;
     }
     break;
   case e32:
     for (reg_t i=P.VU.vstart; i<vl; ++i) {
-      auto &vd = P.VU.elt<float32_t>(rd_num, i, true);
+      auto &vd = P.VU.elt_ref<float32_t>(rd_num, i, true);
       auto rs1 = f32(READ_FREG(rs1_num));
-      auto vs2 = P.VU.elt<float32_t>(rs2_num, i);
+      auto vs2 = P.VU.elt_val<float32_t>(rs2_num, i);
 
       int midx = i / 64;
       int mpos = i % 64;
-      bool use_first = (P.VU.elt<uint64_t>(0, midx) >> mpos) & 0x1;
+      bool use_first = (P.VU.elt_val<uint64_t>(0, midx) >> mpos) & 0x1;
 
       vd = use_first ? rs1 : vs2;
     }
     break;
   case e64:
     for (reg_t i=P.VU.vstart; i<vl; ++i) {
-      auto &vd = P.VU.elt<float64_t>(rd_num, i, true);
+      auto &vd = P.VU.elt_ref<float64_t>(rd_num, i, true);
       auto rs1 = f64(READ_FREG(rs1_num));
-      auto vs2 = P.VU.elt<float64_t>(rs2_num, i);
+      auto vs2 = P.VU.elt_val<float64_t>(rs2_num, i);
 
       int midx = i / 64;
       int mpos = i % 64;
-      bool use_first = (P.VU.elt<uint64_t>(0, midx) >> mpos) & 0x1;
+      bool use_first = (P.VU.elt_val<uint64_t>(0, midx) >> mpos) & 0x1;
 
       vd = use_first ? rs1 : vs2;
     }

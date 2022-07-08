@@ -11,19 +11,19 @@ if (!(rs1 >= 0 && rs1 < (P.VU.get_vlen() / sew))) {
 } else {
   switch(sew) {
   case e8:
-    WRITE_RD(P.VU.elt<int8_t>(rs2_num, rs1));
+    WRITE_RD(P.VU.elt_val<int8_t>(rs2_num, rs1));
     break;
   case e16:
-    WRITE_RD(P.VU.elt<int16_t>(rs2_num, rs1));
+    WRITE_RD(P.VU.elt_val<int16_t>(rs2_num, rs1));
     break;
   case e32:
-    WRITE_RD(P.VU.elt<int32_t>(rs2_num, rs1));
+    WRITE_RD(P.VU.elt_val<int32_t>(rs2_num, rs1));
     break;
   case e64:
     if (P.get_max_xlen() <= sew)
-      WRITE_RD(P.VU.elt<uint64_t>(rs2_num, rs1) & xmask);
+      WRITE_RD(P.VU.elt_val<uint64_t>(rs2_num, rs1) & xmask);
     else
-      WRITE_RD(P.VU.elt<uint64_t>(rs2_num, rs1));
+      WRITE_RD(P.VU.elt_val<uint64_t>(rs2_num, rs1));
     break;
   }
 }

@@ -15,67 +15,67 @@ static const arg_t* opt = nullptr;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return std::to_string((int)insn.i_imm()) + '(' + xpr_name[insn.rs1()] + ')';
+    return std::to_string((int)insn.i_imm()) + '(' + xpr_arch_name[insn.rs1()] + ')';
   }
 } load_address;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return std::to_string((int)insn.s_imm()) + '(' + xpr_name[insn.rs1()] + ')';
+    return std::to_string((int)insn.s_imm()) + '(' + xpr_arch_name[insn.rs1()] + ')';
   }
 } store_address;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return std::string("(") + xpr_name[insn.rs1()] + ')';
+    return std::string("(") + xpr_arch_name[insn.rs1()] + ')';
   }
 } base_only_address;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return xpr_name[insn.rd()];
+    return xpr_arch_name[insn.rd()];
   }
 } xrd;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return xpr_name[insn.rs1()];
+    return xpr_arch_name[insn.rs1()];
   }
 } xrs1;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return xpr_name[insn.rs2()];
+    return xpr_arch_name[insn.rs2()];
   }
 } xrs2;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return xpr_name[insn.rs3()];
+    return xpr_arch_name[insn.rs3()];
   }
 } xrs3;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return fpr_name[insn.rd()];
+    return fpr_arch_name[insn.rd()];
   }
 } frd;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return fpr_name[insn.rs1()];
+    return fpr_arch_name[insn.rs1()];
   }
 } frs1;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return fpr_name[insn.rs2()];
+    return fpr_arch_name[insn.rs2()];
   }
 } frs2;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return fpr_name[insn.rs3()];
+    return fpr_arch_name[insn.rs3()];
   }
 } frs3;
 
@@ -144,43 +144,43 @@ struct : public arg_t {
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return xpr_name[insn.rvc_rs1()];
+    return xpr_arch_name[insn.rvc_rs1()];
   }
 } rvc_rs1;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return xpr_name[insn.rvc_rs2()];
+    return xpr_arch_name[insn.rvc_rs2()];
   }
 } rvc_rs2;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return fpr_name[insn.rvc_rs2()];
+    return fpr_arch_name[insn.rvc_rs2()];
   }
 } rvc_fp_rs2;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return xpr_name[insn.rvc_rs1s()];
+    return xpr_arch_name[insn.rvc_rs1s()];
   }
 } rvc_rs1s;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return xpr_name[insn.rvc_rs2s()];
+    return xpr_arch_name[insn.rvc_rs2s()];
   }
 } rvc_rs2s;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return fpr_name[insn.rvc_rs2s()];
+    return fpr_arch_name[insn.rvc_rs2s()];
   }
 } rvc_fp_rs2s;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return xpr_name[X_SP];
+    return xpr_arch_name[X_SP];
   }
 } rvc_sp;
 
@@ -224,37 +224,37 @@ struct : public arg_t {
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return std::to_string((int)insn.rvc_lwsp_imm()) + '(' + xpr_name[X_SP] + ')';
+    return std::to_string((int)insn.rvc_lwsp_imm()) + '(' + xpr_arch_name[X_SP] + ')';
   }
 } rvc_lwsp_address;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return std::to_string((int)insn.rvc_ldsp_imm()) + '(' + xpr_name[X_SP] + ')';
+    return std::to_string((int)insn.rvc_ldsp_imm()) + '(' + xpr_arch_name[X_SP] + ')';
   }
 } rvc_ldsp_address;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return std::to_string((int)insn.rvc_swsp_imm()) + '(' + xpr_name[X_SP] + ')';
+    return std::to_string((int)insn.rvc_swsp_imm()) + '(' + xpr_arch_name[X_SP] + ')';
   }
 } rvc_swsp_address;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return std::to_string((int)insn.rvc_sdsp_imm()) + '(' + xpr_name[X_SP] + ')';
+    return std::to_string((int)insn.rvc_sdsp_imm()) + '(' + xpr_arch_name[X_SP] + ')';
   }
 } rvc_sdsp_address;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return std::to_string((int)insn.rvc_lw_imm()) + '(' + xpr_name[insn.rvc_rs1s()] + ')';
+    return std::to_string((int)insn.rvc_lw_imm()) + '(' + xpr_arch_name[insn.rvc_rs1s()] + ')';
   }
 } rvc_lw_address;
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return std::to_string((int)insn.rvc_ld_imm()) + '(' + xpr_name[insn.rvc_rs1s()] + ')';
+    return std::to_string((int)insn.rvc_ld_imm()) + '(' + xpr_arch_name[insn.rvc_rs1s()] + ')';
   }
 } rvc_ld_address;
 
@@ -280,7 +280,7 @@ struct : public arg_t {
 
 struct : public arg_t {
   std::string to_string(insn_t insn) const {
-    return std::string("(") + xpr_name[insn.rs1()] + ')';
+    return std::string("(") + xpr_arch_name[insn.rs1()] + ')';
   }
 } v_address;
 

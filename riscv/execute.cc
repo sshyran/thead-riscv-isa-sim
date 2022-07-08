@@ -27,26 +27,26 @@ static void commit_log_print_value(FILE *log_file, int width, const void *data)
 
   switch (width) {
     case 8:
-      fprintf(log_file, "0x%01" PRIx8, *(const uint8_t *)data);
+      //fprintf(log_file, "0x%01" PRIx8, *(const uint8_t *)data);
       break;
     case 16:
-      fprintf(log_file, "0x%04" PRIx16, *(const uint16_t *)data);
+      //fprintf(log_file, "0x%04" PRIx16, *(const uint16_t *)data);
       break;
     case 32:
-      fprintf(log_file, "0x%08" PRIx32, *(const uint32_t *)data);
+      //fprintf(log_file, "0x%08" PRIx32, *(const uint32_t *)data);
       break;
     case 64:
-      fprintf(log_file, "0x%016" PRIx64, *(const uint64_t *)data);
+      //fprintf(log_file, "0x%016" PRIx64, *(const uint64_t *)data);
       break;
     default:
       // max lengh of vector
       if (((width - 1) & width) == 0) {
         const uint64_t *arr = (const uint64_t *)data;
 
-        fprintf(log_file, "0x");
-        for (int idx = width / 64 - 1; idx >= 0; --idx) {
-          fprintf(log_file, "%016" PRIx64, arr[idx]);
-        }
+        //fprintf(log_file, "0x");
+        //for (int idx = width / 64 - 1; idx >= 0; --idx) {
+        //  fprintf(log_file, "%016" PRIx64, arr[idx]);
+        //}
       } else {
         abort();
       }
@@ -76,13 +76,13 @@ static void commit_log_print_insn(processor_t *p, reg_t pc, insn_t insn)
   int flen = p->get_state()->last_inst_flen;
 
   // print core id on all lines so it is easy to grep
-  fprintf(log_file, "core%4" PRId32 ": ", p->get_id());
+  //fprintf(log_file, "core%4" PRId32 ": ", p->get_id());
 
-  fprintf(log_file, "%1d ", priv);
+  //fprintf(log_file, "%1d ", priv);
   commit_log_print_value(log_file, xlen, pc);
-  fprintf(log_file, " (");
+  //fprintf(log_file, " (");
   commit_log_print_value(log_file, insn.length() * 8, insn.bits());
-  fprintf(log_file, ")");
+  //fprintf(log_file, ")");
   bool show_vec = false;
 
   for (auto item : reg) {
@@ -121,19 +121,19 @@ static void commit_log_print_insn(processor_t *p, reg_t pc, insn_t insn)
     }
 
     if (!show_vec && (is_vreg || is_vec)) {
-        fprintf(log_file, " e%ld %s%ld l%ld",
-                p->VU.vsew,
-                p->VU.vflmul < 1 ? "mf" : "m",
-                p->VU.vflmul < 1 ? (reg_t)(1 / p->VU.vflmul) : (reg_t)p->VU.vflmul,
-                p->VU.vl);
+        //fprintf(log_file, " e%ld %s%ld l%ld",
+        //        p->VU.vsew,
+        //        p->VU.vflmul < 1 ? "mf" : "m",
+        //        p->VU.vflmul < 1 ? (reg_t)(1 / p->VU.vflmul) : (reg_t)p->VU.vflmul,
+        //        p->VU.vl);
         show_vec = true;
     }
 
     if (!is_vec) {
       if (prefix == 'c')
-        fprintf(log_file, " c%d_%s ", rd, csr_name(rd));
+        //fprintf(log_file, " c%d_%s ", rd, csr_name(rd));
       else
-        fprintf(log_file, " %c%2d ", prefix, rd);
+        //fprintf(log_file, " %c%2d ", prefix, rd);
       if (is_vreg)
         commit_log_print_value(log_file, size, &p->VU.elt<uint8_t>(rd, 0));
       else
@@ -142,17 +142,17 @@ static void commit_log_print_insn(processor_t *p, reg_t pc, insn_t insn)
   }
 
   for (auto item : load) {
-    fprintf(log_file, " mem ");
+    //fprintf(log_file, " mem ");
     commit_log_print_value(log_file, xlen, std::get<0>(item));
   }
 
   for (auto item : store) {
-    fprintf(log_file, " mem ");
+    //fprintf(log_file, " mem ");
     commit_log_print_value(log_file, xlen, std::get<0>(item));
-    fprintf(log_file, " ");
+    //fprintf(log_file, " ");
     commit_log_print_value(log_file, std::get<2>(item) << 3, std::get<1>(item));
   }
-  fprintf(log_file, "\n");
+  //fprintf(log_file, "\n");
 }
 #else
 static void commit_log_reset(processor_t* p) {}
@@ -256,7 +256,7 @@ void processor_t::step(size_t n)
     {
       take_pending_interrupt();
 
-      if (unlikely(slow_path()))
+      if (true || unlikely(slow_path()))
       {
         // Main simulation loop, slow path.
         while (instret < n)
@@ -275,8 +275,8 @@ void processor_t::step(size_t n)
           }
 
           insn_fetch_t fetch = mmu->load_insn(pc);
-          if (debug && !state.serialized)
-            disasm(fetch.insn);
+          //if (debug && !state.serialized)
+          //  disasm(fetch.insn);
           pc = execute_insn(this, pc, fetch);
           advance_pc();
         }

@@ -136,17 +136,17 @@ std::string dts_compile(const std::string& dts)
   }
 
   // Child process to output dtb
-  if (dtb_pid == 0) {
-    dup2(dts_pipe[0], 0);
-    dup2(dtb_pipe[1], 1);
-    close(dts_pipe[0]);
-    close(dts_pipe[1]);
-    close(dtb_pipe[0]);
-    close(dtb_pipe[1]);
-    execlp(DTC, DTC, "-O", "dtb", 0);
-    std::cerr << "Failed to run " DTC ": " << strerror(errno) << std::endl;
-    exit(1);
-  }
+//   if (dtb_pid == 0) {
+//     dup2(dts_pipe[0], 0);
+//     dup2(dtb_pipe[1], 1);
+//     close(dts_pipe[0]);
+//     close(dts_pipe[1]);
+//     close(dtb_pipe[0]);
+//     close(dtb_pipe[1]);
+//     execlp(DTC, DTC, "-O", "dtb", 0);
+//     std::cerr << "Failed to run " DTC ": " << strerror(errno) << std::endl;
+//     exit(1);
+//   }
 
   close(dts_pipe[1]);
   close(dts_pipe[0]);
@@ -168,16 +168,16 @@ std::string dts_compile(const std::string& dts)
 
   // Reap children
   int status;
-  waitpid(dts_pid, &status, 0);
-  if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-    std::cerr << "Child dts process failed" << std::endl;
-    exit(1);
-  }
-  waitpid(dtb_pid, &status, 0);
-  if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-    std::cerr << "Child dtb process failed" << std::endl;
-    exit(1);
-  }
+//   waitpid(dts_pid, &status, 0);
+//   if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+//     std::cerr << "Child dts process failed" << std::endl;
+//     exit(1);
+//   }
+//   waitpid(dtb_pid, &status, 0);
+//   if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+//     std::cerr << "Child dtb process failed" << std::endl;
+//     exit(1);
+//   }
 
   return dtb.str();
 }

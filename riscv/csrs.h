@@ -77,6 +77,12 @@ class pmpaddr_csr_t: public csr_t {
   // Is the specified access allowed given the pmpcfg privileges?
   bool access_ok(access_type type, reg_t mode) const noexcept;
 
+  // Public wrapper for tor_paddr().
+  reg_t get_tor_paddr() const noexcept;
+
+  // Return the associated pmp_cfg value.
+  uint8_t get_cfg() const noexcept;
+
  protected:
   virtual bool unlogged_write(const reg_t val) noexcept override;
  private:

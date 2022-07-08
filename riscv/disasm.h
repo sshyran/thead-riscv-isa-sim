@@ -8,8 +8,8 @@
 #include <sstream>
 #include <vector>
 
-extern const char* xpr_name[NXPR];
-extern const char* fpr_name[NFPR];
+extern const char* xpr_arch_name[NXPR];
+extern const char* fpr_arch_name[NFPR];
 extern const char* vr_name[NVPR];
 extern const char* csr_name(int which);
 

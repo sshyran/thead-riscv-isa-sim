@@ -1,4 +1,5 @@
 // See LICENSE for license details.
+
 #ifndef _RISCV_PROCESSOR_H
 #define _RISCV_PROCESSOR_H
 
@@ -14,6 +15,8 @@
 #include "debug_rom_defines.h"
 #include "entropy_source.h"
 #include "csrs.h"
+#include <iostream>
+
 
 class processor_t;
 class mmu_t;
@@ -153,7 +156,7 @@ struct type_sew_t<64>
 // architectural state of a RISC-V hart
 struct state_t
 {
-  void reset(processor_t* const proc, reg_t max_isa);
+  void reset(processor_t* const proc, reg_t max_isa, uint32_t id);
 
   static const int num_triggers = 4;
 
@@ -232,6 +235,11 @@ struct state_t
   int last_inst_xlen;
   int last_inst_flen;
 #endif
+
+  size_t pid;
+
+  state_t(size_t id): XPR(id), FPR(id), pid(id) {};
+  state_t(): XPR(0), FPR(0), pid(0) {};
 };
 
 typedef enum {
@@ -285,8 +293,13 @@ class processor_t : public abstract_device_t
 public:
   processor_t(const char* isa, const char* priv, const char* varch,
               simif_t* sim, uint32_t id, bool halt_on_reset,
-              FILE *log_file, std::ostream& sout_); // because of command line option --log and -s we need both
+              std::ostream& sout_); // because of command line option --log and -s we need both
   ~processor_t();
+
+  bool set_pc_api(const std::string& name, const uint8_t* bytes, size_t len); //len advertises the size of the buffer
+  bool retrieve_pc_api(uint8_t* bytes, const std::string& name, size_t len); //len advertises the size of the buffer
+
+  void retrieve_privilege_api(reg_t* prv);
 
   void set_debug(bool value);
   void set_histogram(bool value);
@@ -297,9 +310,11 @@ public:
   void reset();
   void step(size_t n); // run for n cycles
   void set_csr(int which, reg_t val);
+  void set_csr_api(int which, reg_t val);
   uint32_t get_id() const { return id; }
   reg_t get_csr(int which, insn_t insn, bool write, bool peek = 0);
   reg_t get_csr(int which) { return get_csr(which, insn_t(0), false, true); }
+  reg_t get_csr_api(int which);
   mmu_t* get_mmu() { return mmu; }
   state_t* get_state() { return &state; }
   unsigned get_xlen() { return xlen; }
@@ -349,6 +364,7 @@ public:
   }
   reg_t legalize_privilege(reg_t);
   void set_privilege(reg_t);
+  void set_privilege_api(reg_t prv);
   void set_virt(bool);
   void update_histogram(reg_t pc);
   const disassembler_t* get_disassembler() { return disassembler; }
@@ -531,7 +547,10 @@ public:
       bool vill;
       bool vstart_alu;
 
-      // vector element for varies SEW
+      template<class T>
+      void do_callback(reg_t vecRegIndex, reg_t eltIndex, const char pAccessType[]) const; 
+  
+      // vector element for varing SEW
       template<class T>
         T& elt(reg_t vReg, reg_t n, bool is_write = false){
           assert(vsew != 0);
@@ -539,21 +558,32 @@ public:
           reg_t elts_per_reg = (VLEN >> 3) / (sizeof(T));
           vReg += n / elts_per_reg;
           n = n % elts_per_reg;
+          reg_referenced[vReg] = 1;
+  
 #ifdef WORDS_BIGENDIAN
           // "V" spec 0.7.1 requires lower indices to map to lower significant
           // bits when changing SEW, thus we need to index from the end on BE.
           n ^= elts_per_reg - 1;
 #endif
-          reg_referenced[vReg] = 1;
-
-#ifdef RISCV_ENABLE_COMMITLOG
-          if (is_write)
-            p->get_state()->log_reg_write[((vReg) << 4) | 2] = {0, 0};
-#endif
 
           T *regStart = (T*)((char*)reg_file + vReg * (VLEN >> 3));
           return regStart[n];
         }
+  
+      template<class T>
+        T elt_val(reg_t vecReg, reg_t n, bool is_write = false){
+          T reg_val = elt<T>(vecReg, n, is_write);
+          do_callback<T>(vecReg, n, "read"); 
+          return reg_val;
+        }
+  
+       template<class T>
+        T& elt_ref(reg_t vecReg, reg_t n, bool is_write = false){
+          T& r_reg_ref = elt<T>(vecReg, n, is_write);
+          do_callback<T>(vecReg, n, "write"); 
+          return r_reg_ref;
+        }
+
     public:
 
       void reset();
@@ -568,6 +598,7 @@ public:
       }
 
       reg_t set_vl(int rd, int rs1, reg_t reqVL, reg_t newType);
+      reg_t set_vl_api(reg_t reqVL, reg_t newType);
 
       reg_t get_vlen() { return VLEN; }
       reg_t get_elen() { return ELEN; }
@@ -580,6 +611,44 @@ public:
 
   vectorUnit_t VU;
 };
+
+extern "C"{
+  // update_vector_element function: for the given cpuid, this callback function is called by the simulator to notify the user that a vector register element has been read or written
+  //
+  //  inputs:
+  //      uint32_t cpuid -- refers to the processor ID
+  //      const char* pRegName -- the base name of the vector register does NOT include a suffix for physical register since this is a FORCE / hardware specific notion.
+  //      uint32_t vecRegIndex -- the numerical index that goes with the vector register base name
+  //      uint32_t eltIndex -- the numerical index of the element that is updated
+  //      uint32_t eltByteWidth -- the number of bytes per element at the time of the update, used in FORCE with the eltIndex to dynamically associate physical registers for aggregated updates
+  //      const uint8_t* value -- the contents of the ENTIRE vector register if this update is a "read" or *nothing* if this is a "write". 
+  //      uint32_t byteLength -- should match the size of the ENTIRE vector register.
+  //      const char* pAccessType -- should be "read" or "write".
+  //
+  void update_vector_element(uint32_t cpuid, const char *pRegName, uint32_t vecRegIndex, uint32_t eltIndex, uint32_t eltByteWidth, const uint8_t* pValue, uint32_t  byteLength, const char* pAccessType);
+}
+
+extern const char* vr_name[];
+
+template<class T>
+void processor_t::vectorUnit_t::do_callback(reg_t vecRegIndex, reg_t eltIndex, const char pAccessType[]) const  
+{
+  reg_t elts_per_reg = (VLEN >> 3) / (sizeof(T));
+  reg_t corrected_vreg_index = vecRegIndex + eltIndex / elts_per_reg;
+  if(corrected_vreg_index > vecRegIndex)
+  {
+    eltIndex %= elts_per_reg;  	
+  }
+
+  #ifdef WORDS_BIGENDIAN
+  // "V" spec 0.7.1 requires lower indices to map to lower significant
+  // bits when changing SEW, thus we need to index from the end on BE.
+  eltIndex ^= elts_per_reg - 1;
+  #endif
+
+  uint8_t *p_reg_start = (uint8_t*)((char*)reg_file + corrected_vreg_index * (VLEN >> 3));
+  update_vector_element(p->get_state()->pid, vr_name[corrected_vreg_index], corrected_vreg_index, eltIndex, sizeof(T), p_reg_start, (VLEN >> 3), pAccessType);
+}
 
 reg_t illegal_instruction(processor_t* p, insn_t insn, reg_t pc);
 

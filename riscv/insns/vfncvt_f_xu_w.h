@@ -4,12 +4,12 @@ VI_VFP_CVT_SCALE
   ;
 },
 {
-  auto vs2 = P.VU.elt<uint32_t>(rs2_num, i);
-  P.VU.elt<float16_t>(rd_num, i, true) = ui32_to_f16(vs2);
+  auto vs2 = P.VU.elt_val<uint32_t>(rs2_num, i);
+  P.VU.elt_ref<float16_t>(rd_num, i, true) = ui32_to_f16(vs2);
 },
 {
-  auto vs2 = P.VU.elt<uint64_t>(rs2_num, i);
-  P.VU.elt<float32_t>(rd_num, i, true) = ui64_to_f32(vs2);
+  auto vs2 = P.VU.elt_val<uint64_t>(rs2_num, i);
+  P.VU.elt_ref<float32_t>(rd_num, i, true) = ui64_to_f32(vs2);
 },
 {
   ;

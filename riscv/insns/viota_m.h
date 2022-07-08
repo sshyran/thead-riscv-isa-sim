@@ -16,8 +16,8 @@ for (reg_t i = 0; i < vl; ++i) {
   const int midx = i / 64;
   const int mpos = i % 64;
 
-  bool vs2_lsb = ((P.VU.elt<uint64_t>(rs2_num, midx) >> mpos) & 0x1) == 1;
-  bool do_mask = (P.VU.elt<uint64_t>(0, midx) >> mpos) & 0x1;
+  bool vs2_lsb = ((P.VU.elt_val<uint64_t>(rs2_num, midx) >> mpos) & 0x1) == 1;
+  bool do_mask = (P.VU.elt_val<uint64_t>(0, midx) >> mpos) & 0x1;
 
   bool has_one = false;
   if (insn.v_vm() == 1 || (insn.v_vm() == 0 && do_mask)) {
@@ -29,20 +29,20 @@ for (reg_t i = 0; i < vl; ++i) {
   bool use_ori = (insn.v_vm() == 0) && !do_mask;
   switch (sew) {
   case e8:
-    P.VU.elt<uint8_t>(rd_num, i, true) = use_ori ?
-                                   P.VU.elt<uint8_t>(rd_num, i) : cnt;
+    P.VU.elt_ref<uint8_t>(rd_num, i, true) = use_ori ?
+                                   P.VU.elt_val<uint8_t>(rd_num, i) : cnt;
     break;
   case e16:
-    P.VU.elt<uint16_t>(rd_num, i, true) = use_ori ?
-                                    P.VU.elt<uint16_t>(rd_num, i) : cnt;
+    P.VU.elt_ref<uint16_t>(rd_num, i, true) = use_ori ?
+                                    P.VU.elt_val<uint16_t>(rd_num, i) : cnt;
     break;
   case e32:
-    P.VU.elt<uint32_t>(rd_num, i, true) = use_ori ?
-                                    P.VU.elt<uint32_t>(rd_num, i) : cnt;
+    P.VU.elt_ref<uint32_t>(rd_num, i, true) = use_ori ?
+                                    P.VU.elt_val<uint32_t>(rd_num, i) : cnt;
     break;
   default:
-    P.VU.elt<uint64_t>(rd_num, i, true) = use_ori ?
-                                    P.VU.elt<uint64_t>(rd_num, i) : cnt;
+    P.VU.elt_ref<uint64_t>(rd_num, i, true) = use_ori ?
+                                    P.VU.elt_val<uint64_t>(rd_num, i) : cnt;
     break;
   }
 

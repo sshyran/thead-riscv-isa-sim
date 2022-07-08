@@ -14,16 +14,16 @@ for (reg_t i = P.VU.vstart ; i < P.VU.vl; ++i) {
 
   switch (sew) {
   case e8:
-    P.VU.elt<uint8_t>(rd_num, i, true) = i;
+    P.VU.elt_ref<uint8_t>(rd_num, i, true) = i;
     break;
   case e16:
-    P.VU.elt<uint16_t>(rd_num, i, true) = i;
+    P.VU.elt_ref<uint16_t>(rd_num, i, true) = i;
     break;
   case e32:
-    P.VU.elt<uint32_t>(rd_num, i, true) = i;
+    P.VU.elt_ref<uint32_t>(rd_num, i, true) = i;
     break;
   default:
-    P.VU.elt<uint64_t>(rd_num, i, true) = i;
+    P.VU.elt_ref<uint64_t>(rd_num, i, true) = i;
     break;
   }
 }

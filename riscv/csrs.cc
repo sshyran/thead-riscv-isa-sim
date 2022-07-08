@@ -182,6 +182,16 @@ bool pmpaddr_csr_t::access_ok(access_type type, reg_t mode) const noexcept {
 }
 
 
+reg_t pmpaddr_csr_t::get_tor_paddr() const noexcept {
+  return tor_paddr();
+}
+
+
+uint8_t pmpaddr_csr_t::get_cfg() const noexcept {
+  return cfg;
+}
+
+
 // implement class pmpcfg_csr_t
 pmpcfg_csr_t::pmpcfg_csr_t(processor_t* const proc, const reg_t addr):
   csr_t(proc, addr) {
